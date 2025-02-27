@@ -1,0 +1,35 @@
+Metadata-Version: 2.1
+Name: keepthink
+Version: 0.0.1
+Summary: A framework for structured multi-step AI reasoning and task decomposition.
+Home-page: https://github.com/woldy/keepthink
+Author: woldy
+Author-email: king@woldy.net
+License: MIT
+Project-URL: Documentation, https://github.com/woldy/keepthink
+Project-URL: Source, https://github.com/woldy/keepthink
+Project-URL: Bug Tracker, https://github.com/woldy/keepthink/issues
+Keywords: AI,OpenAI,task decomposition,LLM,automation
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: openai>=0.27.0
+Requires-Dist: tqdm
+Requires-Dist: requests
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+
+nothing

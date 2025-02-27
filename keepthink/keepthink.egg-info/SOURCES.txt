@@ -1,0 +1,7 @@
+README.md
+setup.py
+keepthink.egg-info/PKG-INFO
+keepthink.egg-info/SOURCES.txt
+keepthink.egg-info/dependency_links.txt
+keepthink.egg-info/requires.txt
+keepthink.egg-info/top_level.txt
