@@ -2,6 +2,7 @@ import os
 import concurrent.futures
 from openai import OpenAI
 from tqdm import tqdm  # 进度条库
+import pkg_resources 
 
 def readfile(file_path, encoding='utf-8'):
     try:
@@ -17,9 +18,18 @@ def readfile(file_path, encoding='utf-8'):
         print(f"未知错误：{str(e)}")
     return None
 
-def load_thinkpromt():
-    path = "prompts/think_prompt"
-    return readfile(path)
+def load_thinkpromt(path=""):
+    try:
+        # 获取包内资源的绝对路径
+        if path=="":
+            path = pkg_resources.resource_filename(
+                'keepthink',  # 包名
+                os.path.join('prompts', 'think_prompt')  # 包内相对路径
+            )
+        return readfile(path)
+    except Exception as e:
+        print(f"加载思考模板失败: {str(e)}")
+        return None
 
 def llm(prompt, client,model,system_str= "你是人工智能助手"):
     """ 执行 LLM 任务，并返回响应 """
@@ -57,7 +67,7 @@ def process_prompts(prompts, client,model,system_str, max_workers=5, progress_ba
 
     return results
 
-def keepthink(prompt, client, background="", rule="", max_workers=3, split_n=0, min_length=0,model="deepseek-r1-250120",system_str= "你是人工智能助手"):
+def keepthink(prompt, client, background="", rule="", max_workers=3, split_n=0, min_length=0,model="deepseek-r1-250120",system_str= "你是人工智能助手",thinkpromt_path=""):
     """ 任务拆分 + 进度显示 """
     print("\n=== 任务初始化 ===")
     
@@ -67,7 +77,7 @@ def keepthink(prompt, client, background="", rule="", max_workers=3, split_n=0, 
         prompt += f"\n本任务输出不少于 {min_length} 字"
     
     print("加载思考模板...")
-    think_prompt = load_thinkpromt()
+    think_prompt = load_thinkpromt(thinkpromt_path)
     if not think_prompt:
         print("错误：无法加载思考模板！")
         return None
@@ -78,7 +88,7 @@ def keepthink(prompt, client, background="", rule="", max_workers=3, split_n=0, 
 
     print("调用 LLM 进行任务拆分...")
     think = llm(think_prompt, client,model=model,system_str= system_str)
-
+    print(think)
     # 数据提取
     unified_rules = ""
     prompts_array = []
@@ -99,6 +109,7 @@ def keepthink(prompt, client, background="", rule="", max_workers=3, split_n=0, 
 
     new_prompts = []
     for i, prompt2 in enumerate(prompts_array, 1):
+        
         new_prompt = f"""
 【背景】
 {background}
@@ -106,7 +117,7 @@ def keepthink(prompt, client, background="", rule="", max_workers=3, split_n=0, 
 【原始任务】
 {prompt}
 
-【被拆分成的子任务】
+【被拆分成的子任务概览】
 {content}
 
 【规则】
@@ -118,6 +129,8 @@ def keepthink(prompt, client, background="", rule="", max_workers=3, split_n=0, 
 2、执行当前任务的时候，要与其它子任务相互配合，不要冲突或重复
 3、仅输出正文内容，不需要有其它内容，正文内容要足够丰富且满足需求
 4、尽量不要有太多的级联列表，多使用长文本的形式
+5、仅对本次任务要求进行回答，无需回答其它部分，无需输出任务编号，也不需要对本次内容进行任何解释，仅输出对应内容即可
+6、本次回答内容不低于2000字
 
 【统一规则】
 {unified_rules}

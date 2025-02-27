@@ -5,14 +5,16 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="keepthink",
-    version="0.0.1",
+    version="0.0.3",
     author="woldy",
     author_email="king@woldy.net",
     description="A framework for structured multi-step AI reasoning and task decomposition.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/woldy/keepthink",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(),  # 自动发现所有包
+    include_package_data=True,  # 启用清单文件
+    package_data={"keepthink": ["prompts/*"]}, 
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
