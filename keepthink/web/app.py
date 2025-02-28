@@ -5,14 +5,24 @@ import traceback
 import json
 import time
 import os
+chat_cache = {}
+active_processes = {}
+
 
 app = Flask(__name__, 
             static_folder=os.path.join(os.path.dirname(__file__), 'static'),
             template_folder=os.path.join(os.path.dirname(__file__), 'templates'))
-chat_cache = {}
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/abort/<chat_id>', methods=['POST'])
+def abort_process(chat_id):
+    if chat_id in active_processes:
+        # 终止生成器逻辑（根据实际处理逻辑实现）
+        active_processes[chat_id]['abort'] = True
+    return jsonify({"status": "terminated"})
 
 @app.route('/process', methods=['POST'])
 def process():
@@ -31,6 +41,7 @@ def process():
 
 @app.route('/stream/<chat_id>', methods=['GET'])
 def stream(chat_id):
+    active_processes[chat_id] = {'abort': False}
     def generate():
         try:
             # 获取处理参数
@@ -76,6 +87,9 @@ def stream(chat_id):
             results = []
             
             for item in gen:
+                if active_processes.get(chat_id, {}).get('abort'):
+                    yield f"data: {json.dumps({'type': 'error', 'message': '请求已被用户终止'})}\n\n"
+                    break
                 #print(item)
                 if item["type"] == "log":
                     # 发送日志信息

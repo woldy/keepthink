@@ -1,3 +1,6 @@
+let isProcessing = false;
+// 终止按钮点击事件
+
 document.addEventListener('DOMContentLoaded', function() {
     // 保留原有的 DOM 元素引用
     const newTopicBtn = document.getElementById('new-topic-btn');
@@ -48,6 +51,22 @@ document.addEventListener('DOMContentLoaded', function() {
     submitTopicBtn.addEventListener('click', handleTopicSubmit);
     advancedToggle.addEventListener('click', toggleAdvancedSettings);
     
+    document.getElementById('abort-btn').addEventListener('click', () => {
+        if (eventSource && isProcessing) {
+            eventSource.close();
+            addLog('用户主动终止了请求', 'warning');
+            isProcessing = false;
+            
+            // 可选：发送终止请求到后端
+            fetch(`/abort/${currentChatId}`, { method: 'POST' });
+            
+            // 移除加载状态
+            const loadingIndicator = document.querySelector('.loading-indicator');
+            if (loadingIndicator) loadingIndicator.remove();
+        }
+    });
+
+
     // 日志区域相关事件监听
     clearLogBtn.addEventListener('click', clearLog);
     minimizeLogBtn.addEventListener('click', toggleLogMinimize);
@@ -296,6 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function connectSSE(chatId, chatData) {
+        isProcessing = true;
         // 如果已有连接，先关闭
         if (eventSource) {
             eventSource.close();
@@ -319,9 +339,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     handleResults(data.content, chatData);
                 } else if (data.type === 'error') {
                     // 处理错误
+                    isProcessing = false;
                     handleRequestError(data.message);
                 } else if (data.type === 'complete') {
                     // 处理完成
+                    isProcessing = false;
                     eventSource.close();
                     addLog('处理完成！', 'success');
                     
@@ -356,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let fullResponse = '';
         
         results.forEach(result => {
-            fullResponse += `## 子任务 ${result.task_number}\n\n${result.content}\n\n`;
+            fullResponse += `>  子任务 ${result.task_number}\n\n${result.content}\n\n`;
         });
         
         chatData.messages.push({
@@ -522,3 +544,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
