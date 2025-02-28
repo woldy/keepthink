@@ -166,6 +166,39 @@ for i, result in enumerate(x, 1):
 
 懒得往上贴了自己看例子吧
 
+## WEBUI
+![image](https://github.com/user-attachments/assets/f400dab2-55ae-43b1-88a3-9e5d2e7e5d99)
+
+![image](https://github.com/user-attachments/assets/a7831927-5c4d-488c-b9fb-a2b4d12cdc5b)
+![image](https://github.com/user-attachments/assets/3ef96e1c-861d-46d7-8c61-3b637e42ec2e)
+![image](https://github.com/user-attachments/assets/7ca35fb4-72ab-43b8-8b44-aeb46f49c71b)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 贡献指南
 欢迎通过 Issue 提交建议或 PR 参与开发：
 1. Fork 本项目
