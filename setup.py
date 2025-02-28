@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="keepthink",
-    version="0.0.3",
+    version="0.0.12",
     author="woldy",
     author_email="king@woldy.net",
     description="A framework for structured multi-step AI reasoning and task decomposition.",
@@ -14,7 +14,14 @@ setuptools.setup(
     url="https://github.com/woldy/keepthink",
     packages=setuptools.find_packages(),  # 自动发现所有包
     include_package_data=True,  # 启用清单文件
-    package_data={"keepthink": ["prompts/*"]}, 
+    package_data={
+        'keepthink': [
+            'web/static/css/*.css',
+            'web/static/js/*.js',
+            'web/templates/*.html',
+            'prompts/*'
+        ]
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -31,12 +38,19 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "openai>=0.27.0",  # 请根据实际需求调整版本
-        "tqdm",            # 进度条（如果你的框架用到了）
-        "requests",        # 网络请求（如果你的框架用到了）
+        "openai", 
+        "tqdm",  
+        "requests",   
+        "Flask",
+        "click"
     ],
     extras_require={
         "dev": ["pytest", "black", "flake8"],  # 仅供开发者使用的依赖
+    },
+    entry_points={
+        'console_scripts': [
+            'keepthink = keepthink.cli:main'
+        ]
     },
     license="MIT",
     keywords="AI, OpenAI, task decomposition, LLM, automation",

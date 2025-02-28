@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeepThink 对话</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css">
+</head>
+<body>
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <!-- Sidebar -->
+            <div class="col-md-3 sidebar">
+                <div class="sidebar-header">
+                    <h3>KeepThink</h3>
+                    <button id="new-topic-btn" class="btn btn-primary w-100 mb-3">
+                        <i class="bi bi-plus-circle"></i> 新话题
+                    </button>
+                </div>
+                <div class="history-container">
+                    <h5>历史话题</h5>
+                    <ul id="history-list" class="list-group">
+                        <!-- History items will be added here -->
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Main chat area -->
+            <div class="col-md-9 main-content">
+                <div id="chat-container">
+                    <div class="welcome-message">
+                        <h3>欢迎使用 KeepThink</h3>
+                        <p>请点击左侧「新话题」按钮开始对话</p>
+                    </div>
+                    <div id="messages-container" class="d-none">
+                        <!-- Messages will be added here -->
+                    </div>
+                    <!-- 在 messages-container 后添加日志区域 -->
+                    <div id="log-resizer" class="log-resizer"></div>
+                    <div id="log-container" class="log-container">
+                        <div class="log-header">
+                            <h6 class="mb-0">处理日志</h6>
+                            <div>
+                                <button id="clear-log" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-trash"></i> 清空
+                                </button>
+                                <button id="minimize-log" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="log-content" class="log-content">
+                            <!-- 日志内容将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Topic Modal -->
+    <div class="modal fade" id="newTopicModal" tabindex="-1" aria-labelledby="newTopicModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newTopicModalLabel">创建新话题</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="topic-form">
+                        <div class="mb-3">
+                            <label for="prompt" class="form-label">具体任务</label>
+                            <textarea class="form-control" id="prompt" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <a id="advanced-toggle" class="text-decoration-none" data-bs-toggle="collapse" href="#advancedSettings" role="button" aria-expanded="false" aria-controls="advancedSettings">
+                                <i class="bi bi-chevron-down"></i> 高级设置
+                            </a>
+                        </div>
+                        
+                        <div class="collapse" id="advancedSettings">
+                            <div class="card card-body mb-3">
+                                <div class="mb-3">
+                                    <label for="background" class="form-label">背景</label>
+                                    <textarea class="form-control" id="background" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="rule" class="form-label">规则</label>
+                                    <textarea class="form-control" id="rule" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="max_workers" class="form-label">最大并行</label>
+                                        <input type="number" class="form-control" id="max_workers" value="0">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="split_n" class="form-label">子任务数</label>
+                                        <input type="number" class="form-control" id="split_n" value="10">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="min_length" class="form-label">输出长度</label>
+                                        <input type="number" class="form-control" id="min_length" value="10000">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="max_tokens" class="form-label">max_tokens</label>
+                                        <input type="number" class="form-control" id="max_tokens" value="16384">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="max_retries" class="form-label">降智重试</label>
+                                        <input type="number" class="form-control" id="max_retries" value="10">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="model" class="form-label">模型</label>
+                                        <input type="text" class="form-control" id="model" value="deepseek-r1-250120">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="system_str" class="form-label">system_str</label>
+                                    <input type="text" class="form-control" id="system_str" value="你是目标领域专家，你是大佬，你要好好思考。">
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="api_key" class="form-label">API Key</label>
+                                        <input type="password" class="form-control" id="api_key" placeholder="请输入API密钥">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="base_url" class="form-label">API Base URL</label>
+                                        <input type="text" class="form-control" id="base_url" value="https://ark.cn-beijing.volces.com/api/v3">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="submit-topic">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

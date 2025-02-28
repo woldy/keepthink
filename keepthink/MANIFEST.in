@@ -1,1 +1,4 @@
 include keepthink/prompts/*
+include keepthink/web/static/js/*
+include keepthink/web/static/css/*
+include keepthink/web/templates/*
